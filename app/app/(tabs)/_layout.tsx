@@ -44,10 +44,9 @@ export default function TabLayout() {
     }
   };
 
-  // Adds a new child node under the root
+  // Adds a new child node under the root with the placeholder "Edit Here..."
   const addRootChild = () => {
-    const nextTaskNumber = rootChildren.length + 1;
-    const newTasks = [...rootChildren, `Task ${nextTaskNumber + 1}`];
+    const newTasks = [...rootChildren, "Edit Here..."];
     setRootChildren(newTasks);
     saveTasks(newTasks); // Save the updated tasks
   };
@@ -62,52 +61,43 @@ export default function TabLayout() {
   // Handle circle press
   const handleCirclePress = (index: number) => {
     console.log(`Circle ${index + 1} pressed`);
-    // Add your custom logic here if needed
   };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors[colorScheme ?? 'light'].background }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         {/* Root Node */}
-        <Text
-          style={{
-            color: Colors[colorScheme ?? 'light'].text,
-            fontSize: 20,
-            marginRight: 10,
-          }}
-        >
-          Click here to start
-        </Text>
         <Pressable
           onPress={toggleRootExpansion}
           style={({ pressed }) => ({
             opacity: pressed ? 0.5 : 1,
           })}
         >
-          <View
+          <Text
             style={{
-              width: 20,
-              height: 20,
-              borderRadius: 10,
-              backgroundColor: Colors[colorScheme ?? 'light'].tint,
+              color: Colors[colorScheme ?? 'light'].text,
+              fontSize: 20,
+              marginRight: 10,
             }}
-          />
+          >
+            Click here to expand/contract
+          </Text>
         </Pressable>
 
         {/* Render child nodes to the right of the root if expanded */}
         {rootExpanded && (
           <View style={{ marginLeft: 20, flexDirection: 'column', alignItems: 'center' }}>
-            {rootChildren.map((placeholder, index) => (
+            {rootChildren.map((task, index) => (
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                 <TextInput
-                  placeholder={placeholder}
+                  placeholder="Edit Here..." // Placeholder text
                   onChangeText={(text) => {
                     const updatedTasks = [...rootChildren];
                     updatedTasks[index] = text;
                     setRootChildren(updatedTasks);
                     saveTasks(updatedTasks); // Save the updated tasks
                   }}
-                  value={placeholder}
+                  value={task === "Edit Here..." ? "" : task} // Display placeholder until edited
                   style={{
                     color: Colors[colorScheme ?? 'light'].text,
                     fontSize: 20,
