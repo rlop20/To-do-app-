@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage from the new package
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -8,21 +9,47 @@ export default function TabLayout() {
   const [rootExpanded, setRootExpanded] = useState(false);
   const [rootChildren, setRootChildren] = useState<string[]>([]);
 
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  // Load tasks from AsyncStorage
+  const loadTasks = async () => {
+    try {
+      const savedTasks = await AsyncStorage.getItem('tasks');
+      if (savedTasks) {
+        setRootChildren(JSON.parse(savedTasks));
+      }
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
+    }
+  };
+
+  // Save tasks to AsyncStorage
+  const saveTasks = async (tasks: string[]) => {
+    try {
+      await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+    } catch (error) {
+      console.error('Failed to save tasks:', error);
+    }
+  };
+
   // Toggles the root node expansion
   const toggleRootExpansion = () => {
     if (rootExpanded) {
       setRootExpanded(false);
-      setRootChildren([]); // Remove all child nodes when collapsing
     } else {
       setRootExpanded(true);
-      setRootChildren(['Task One']); // Create the first child node
+      loadTasks(); // Load tasks when expanding
     }
   };
 
   // Adds a new child node under the root
   const addRootChild = () => {
     const nextTaskNumber = rootChildren.length + 1;
-    setRootChildren([...rootChildren, `Task ${nextTaskNumber + 1}`]);
+    const newTasks = [...rootChildren, `Task ${nextTaskNumber + 1}`];
+    setRootChildren(newTasks);
+    saveTasks(newTasks); // Save the updated tasks
   };
 
   return (
@@ -61,7 +88,13 @@ export default function TabLayout() {
               <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                 <TextInput
                   placeholder={placeholder}
-                  onChangeText={(text) => {}}
+                  onChangeText={(text) => {
+                    const updatedTasks = [...rootChildren];
+                    updatedTasks[index] = text;
+                    setRootChildren(updatedTasks);
+                    saveTasks(updatedTasks); // Save the updated tasks
+                  }}
+                  value={placeholder}
                   style={{
                     color: Colors[colorScheme ?? 'light'].text,
                     fontSize: 20,
