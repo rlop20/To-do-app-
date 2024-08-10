@@ -52,6 +52,19 @@ export default function TabLayout() {
     saveTasks(newTasks); // Save the updated tasks
   };
 
+  // Deletes a child node
+  const deleteRootChild = (index: number) => {
+    const newTasks = rootChildren.filter((_, i) => i !== index);
+    setRootChildren(newTasks);
+    saveTasks(newTasks); // Save the updated tasks after deletion
+  };
+
+  // Handle circle press
+  const handleCirclePress = (index: number) => {
+    console.log(`Circle ${index + 1} pressed`);
+    // Add your custom logic here if needed
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors[colorScheme ?? 'light'].background }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -101,10 +114,21 @@ export default function TabLayout() {
                     marginRight: 10,
                     borderBottomWidth: 1,
                     borderColor: Colors[colorScheme ?? 'light'].tint,
+                    flex: 1, // Make the TextInput take up the remaining space
                   }}
                 />
                 <Pressable
-                  onPress={() => console.log(`Child node ${index + 1} pressed`)}
+                  onPress={() => deleteRootChild(index)} // Delete the child node on press
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.5 : 1,
+                    marginLeft: 10,
+                  })}
+                >
+                  <Text style={{ fontSize: 20, color: 'red' }}>X</Text> {/* X button */}
+                </Pressable>
+                {/* Circle to the right of the X button */}
+                <Pressable
+                  onPress={() => handleCirclePress(index)} // Handle circle press
                   style={({ pressed }) => ({
                     opacity: pressed ? 0.5 : 1,
                     marginLeft: 10,
